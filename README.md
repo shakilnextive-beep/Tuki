@@ -82,7 +82,7 @@ Tuki checks for updates by itself (Settings → General → *Check for updates a
 
 Your opinion makes Tuki better:
 
-- ⭐ **Leave a review or suggestion:** [Discussions](https://github.com/shakilnextive-beep/Tuki/discussions)
+- ⭐ **Leave a review or suggestion:** [Reviews & Suggestions](https://github.com/shakilnextive-beep/Tuki/discussions/1)
 - 🐞 **Report a problem:** [New issue](https://github.com/shakilnextive-beep/Tuki/issues/new/choose)
 - ✉️ **Email:** [shakil.nextive@gmail.com](mailto:shakil.nextive@gmail.com)
 
@@ -98,7 +98,7 @@ If you like Tuki, a ⭐ on this page helps others find it.
 - **প্রথমবার খুললে** macOS সতর্কবার্তা দেখাতে পারে। তখন **System Settings → Privacy & Security**-এ গিয়ে **Open Anyway** চাপুন।
 - **ব্যবহার:** <kbd>⇧</kbd><kbd>⌘</kbd><kbd>V</kbd> চাপুন। Paste করার অনুমতি একবার দিতে হবে, Tuki নিজেই ধাপগুলো দেখিয়ে দেবে।
 - **আপডেট:** নতুন version এলে Tuki নিজেই জানাবে। এক ক্লিকে আপডেট হয়ে যাবে, পুরোনোটা মুছে নতুনটা বসে যাবে।
-- **মতামত দিন:** [Discussions](https://github.com/shakilnextive-beep/Tuki/discussions) পাতায় লিখুন, অথবা ইমেইল করুন।
+- **মতামত দিন:** [Reviews & Suggestions](https://github.com/shakilnextive-beep/Tuki/discussions/1) পাতায় লিখুন, অথবা ইমেইল করুন।
 - **Windows version:** শীঘ্রই আসছে।
 
 ---
