@@ -156,7 +156,7 @@ final class Store: ObservableObject {
         let fm = FileManager.default
         var total: Int64 = 0
         if let e = fm.enumerator(at: folderURL, includingPropertiesForKeys: [.fileSizeKey]) {
-            for case let u as URL in e where !u.path.contains("/signing/") {
+            for case let u as URL in e {
                 total += Int64((try? u.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0)
             }
         }

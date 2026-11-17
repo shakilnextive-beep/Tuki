@@ -37,9 +37,9 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 </plist>
 PLIST
 
-# Sign with Tuki's own private certificate (kept in ~/Library/Application Support/Tuki/signing),
+# Sign with Tuki's own private certificate (kept in ~/Library/Application Support/TukiDeveloper/signing, never on GitHub),
 # so macOS keeps Tuki's paste permission after every rebuild. Falls back to ad-hoc if it is missing.
-SIGN_DIR="$HOME/Library/Application Support/Tuki/signing"
+SIGN_DIR="$HOME/Library/Application Support/TukiDeveloper/signing"
 KC="$SIGN_DIR/tuki-signing.keychain-db"
 if [[ -f "$KC" && -f "$SIGN_DIR/pw" ]]; then
   security unlock-keychain -p "$(cat "$SIGN_DIR/pw")" "$KC"
