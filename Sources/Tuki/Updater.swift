@@ -39,20 +39,19 @@ final class Updater: ObservableObject {
         working = true; status = "Checking…"
         defer { working = false }
         do {
-            var req = URLRequest(url: URL(string: "https://api.github.com/repos/\(AppInfo.repo)/releases/latest")!)
-            req.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
-            let (data, resp) = try await URLSession.shared.data(for: req)
-            guard (resp as? HTTPURLResponse)?.statusCode == 200,
-                  let j = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let tag = j["tag_name"] as? String,
-                  let assets = j["assets"] as? [[String: Any]],
-                  let zip = assets.first(where: { ($0["name"] as? String) == "Tuki-mac.zip" }),
-                  let u = (zip["browser_download_url"] as? String).flatMap(URL.init(string:)) else {
+            // github.com/…/releases/latest redirects to …/releases/tag/vX.Y.Z. Unlike GitHub's API,
+            // this has no 60-checks-per-hour limit, which shared office and mobile connections hit quickly.
+            var req = URLRequest(url: URL(string: "https://github.com/\(AppInfo.repo)/releases/latest")!)
+            req.httpMethod = "HEAD"
+            let (_, resp) = try await URLSession.shared.data(for: req)
+            guard let final = (resp as? HTTPURLResponse)?.url, final.path.contains("/releases/tag/") else {
                 status = "Couldn't check for updates."; return
             }
+            let tag = final.lastPathComponent
             let v = tag.hasPrefix("v") ? String(tag.dropFirst()) : tag
+            let zip = URL(string: "https://github.com/\(AppInfo.repo)/releases/download/\(tag)/Tuki-mac.zip")!
             if Self.isNewer(v, than: AppInfo.version) {
-                available = Release(version: v, notes: j["body"] as? String ?? "", zipURL: u)
+                available = Release(version: v, notes: await notes(tag), zipURL: zip)
                 status = "Tuki \(v) is available."
                 if !userAsked { offer() }
             } else {
@@ -62,6 +61,14 @@ final class Updater: ObservableObject {
         } catch {
             status = "Couldn't reach GitHub. Check the internet connection."
         }
+    }
+
+    /// Release notes from GitHub's API; optional, so a rate limit only hides the notes.
+    private func notes(_ tag: String) async -> String {
+        guard let u = URL(string: "https://api.github.com/repos/\(AppInfo.repo)/releases/tags/\(tag)"),
+              let (d, r) = try? await URLSession.shared.data(from: u), (r as? HTTPURLResponse)?.statusCode == 200,
+              let j = try? JSONSerialization.jsonObject(with: d) as? [String: Any] else { return "" }
+        return j["body"] as? String ?? ""
     }
 
     /// Asks once whether to install the new version now.
