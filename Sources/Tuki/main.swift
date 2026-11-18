@@ -229,6 +229,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // The permission steps appear the first time the user opens the panel, never by surprise.
         UIState.shared.showPermissionHelp = !Paster.isTrusted
         Updater.shared.startAutomaticChecks()
+        if MoveToApplications.offerIfNeeded() { return }
+        LoginItem.setUpOnFirstRun()
     }
 
     func applicationWillTerminate(_ notification: Notification) {

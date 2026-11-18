@@ -1,3 +1,4 @@
+import ServiceManagement
 import AppKit
 import Carbon.HIToolbox
 
@@ -61,25 +62,73 @@ enum Pref {
     static func string(_ k: String) -> String { d.string(forKey: k) ?? "" }
 }
 
-/// Starts Tuki when the Mac starts, through a small launch file in ~/Library/LaunchAgents.
+/// Starts Tuki when the Mac starts, through macOS's own Login Items
+/// (System Settings → General → Login Items), which follows the app wherever it is.
 enum LoginItem {
-    static var url: URL {
+    /// The launch file older versions used; removed when the new way is turned on.
+    static var oldAgent: URL {
         FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent("Library/LaunchAgents/app.tuki.clipboard.plist")
     }
-    static var isOn: Bool { FileManager.default.fileExists(atPath: url.path) }
+    static var isOn: Bool { SMAppService.mainApp.status == .enabled }
 
     static func set(_ on: Bool) {
-        if !on { try? FileManager.default.removeItem(at: url); return }
-        let plist: [String: Any] = [
-            "Label": "app.tuki.clipboard",
-            "ProgramArguments": ["/usr/bin/open", "-a", Bundle.main.bundlePath],
-            "RunAtLoad": true,
-        ]
-        try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        if let data = try? PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0) {
-            try? data.write(to: url)
+        try? FileManager.default.removeItem(at: oldAgent)
+        if on { try? SMAppService.mainApp.register() } else { try? SMAppService.mainApp.unregister() }
+    }
+
+    /// The first time Tuki runs it turns "Launch at login" on, as the README promises.
+    /// Later launches keep whatever the user chose in Settings.
+    static func setUpOnFirstRun() {
+        let key = "loginItemSetUp"
+        if !UserDefaults.standard.bool(forKey: key) {
+            set(true)
+            UserDefaults.standard.set(true, forKey: key)
+        } else if FileManager.default.fileExists(atPath: oldAgent.path) {
+            set(true)   // move users of the old launch file to Login Items
         }
+    }
+}
+
+/// macOS can only start Tuki at login if it sits in Applications: an app on an external
+/// drive or in Downloads may not be there yet when the Mac starts. Offers to move it, once.
+@MainActor
+enum MoveToApplications {
+    /// Returns true when Tuki is moving itself and about to quit.
+    @discardableResult static func offerIfNeeded() -> Bool {
+        let here = Bundle.main.bundleURL.standardizedFileURL
+        let apps = ["/Applications/", FileManager.default.homeDirectoryForCurrentUser.path + "/Applications/"]
+        guard !apps.contains(where: { here.path.hasPrefix($0) }),
+              !UserDefaults.standard.bool(forKey: "declinedMoveToApplications") else { return false }
+        let a = NSAlert()
+        a.messageText = "Move Tuki to the Applications folder?"
+        a.informativeText = "Tuki is running from \(here.deletingLastPathComponent().path). To start by itself when your Mac starts, it needs to be in Applications. Tuki will move itself and restart."
+        a.addButton(withTitle: "Move to Applications")
+        a.addButton(withTitle: "Not Now")
+        NSApp.activate(ignoringOtherApps: true)
+        guard a.runModal() == .alertFirstButtonReturn else {
+            UserDefaults.standard.set(true, forKey: "declinedMoveToApplications"); return false
+        }
+        let fm = FileManager.default
+        let target = URL(fileURLWithPath: "/Applications/Tuki.app")
+        do {
+            if fm.fileExists(atPath: target.path) { try fm.trashItem(at: target, resultingItemURL: nil) }
+            try fm.copyItem(at: here, to: target)
+        } catch {
+            let e = NSAlert()
+            e.messageText = "Couldn't move Tuki"
+            e.informativeText = "Drag Tuki into the Applications folder in Finder instead. (\(error.localizedDescription))"
+            e.runModal(); return false
+        }
+        // Old copy goes to the Trash (not deleted), the new one starts, this one quits.
+        try? fm.trashItem(at: here, resultingItemURL: nil)
+        Store.shared.writeNow()
+        let p = Process()
+        p.executableURL = URL(fileURLWithPath: "/bin/sh")
+        p.arguments = ["-c", "while kill -0 \(ProcessInfo.processInfo.processIdentifier) 2>/dev/null; do sleep 0.2; done; open \"\(target.path)\""]
+        try? p.run()
+        NSApp.terminate(nil)
+        return true
     }
 }
 
