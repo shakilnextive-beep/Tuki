@@ -96,9 +96,9 @@ enum LoginItem {
 enum MoveToApplications {
     /// Returns true when Tuki is moving itself and about to quit.
     @discardableResult static func offerIfNeeded() -> Bool {
-        let here = Bundle.main.bundleURL.standardizedFileURL
-        let apps = ["/Applications/", FileManager.default.homeDirectoryForCurrentUser.path + "/Applications/"]
-        guard !apps.contains(where: { here.path.hasPrefix($0) }),
+        let running = Bundle.main.bundleURL
+        let here = AppLocation.original
+        guard !AppLocation.isInApplications(here),
               !UserDefaults.standard.bool(forKey: "declinedMoveToApplications") else { return false }
         let a = NSAlert()
         a.messageText = "Move Tuki to the Applications folder?"
@@ -113,7 +113,10 @@ enum MoveToApplications {
         let target = URL(fileURLWithPath: "/Applications/Tuki.app")
         do {
             if fm.fileExists(atPath: target.path) { try fm.trashItem(at: target, resultingItemURL: nil) }
-            try fm.copyItem(at: here, to: target)
+            try fm.copyItem(at: running, to: target)
+            // Without this, macOS would again run the copy from a hidden read-only place.
+            let x = Process(); x.executableURL = URL(fileURLWithPath: "/usr/bin/xattr")
+            x.arguments = ["-dr", "com.apple.quarantine", target.path]; try? x.run(); x.waitUntilExit()
         } catch {
             let e = NSAlert()
             e.messageText = "Couldn't move Tuki"

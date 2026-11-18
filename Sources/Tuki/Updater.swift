@@ -100,13 +100,19 @@ final class Updater: ObservableObject {
             guard fm.fileExists(atPath: newApp.appendingPathComponent("Contents/MacOS/Tuki").path) else {
                 status = "The download looks broken. Try again later."; return
             }
-            // Replace this copy after Tuki quits, then open the new one. Old version is removed, not kept beside it.
-            let target = Bundle.main.bundlePath
+            // Replace this copy after Tuki quits, then open the new one. The old version is removed, not kept beside it.
+            // A copy outside Applications (Downloads, an external drive) is moved into /Applications, because macOS
+            // runs such downloads from a hidden read-only place where they can't be replaced or started at login.
+            let original = AppLocation.original
+            let inApps = AppLocation.isInApplications(original)
+            let target = inApps ? original.path : "/Applications/Tuki.app"
+            let log = Store.shared.folderURL.appendingPathComponent("update.log").path
             let script = """
+            exec >"\(log)" 2>&1
             while kill -0 \(ProcessInfo.processInfo.processIdentifier) 2>/dev/null; do sleep 0.2; done
+            xattr -dr com.apple.quarantine "\(newApp.path)"
             rm -rf "\(target)"
-            mv "\(newApp.path)" "\(target)"
-            xattr -dr com.apple.quarantine "\(target)" 2>/dev/null
+            mv "\(newApp.path)" "\(target)" || ditto "\(newApp.path)" "\(target)"
             open "\(target)"
             rm -rf "\(tmp.path)"
             """
@@ -114,10 +120,16 @@ final class Updater: ObservableObject {
             p.executableURL = URL(fileURLWithPath: "/bin/sh")
             p.arguments = ["-c", script]
             try p.run()
+            // The copy outside Applications goes to the Trash, so there is only one Tuki.
+            if !inApps { try? fm.trashItem(at: original, resultingItemURL: nil) }
             Store.shared.writeNow()
             NSApp.terminate(nil)
         } catch {
             status = "Update failed: \(error.localizedDescription)"
+            let a = NSAlert()
+            a.messageText = "Tuki couldn't update"
+            a.informativeText = "\(error.localizedDescription)\n\nYou can download the new version from the Tuki GitHub page instead."
+            a.runModal()
         }
     }
 
@@ -178,5 +190,27 @@ struct AboutSettings: View {
             .font(.system(size: 12))
         }
         .frame(maxWidth: .infinity)
+    }
+}
+
+/// Where Tuki.app really is. macOS runs a downloaded app that was never moved from a hidden,
+/// read-only copy ("App Translocation"); this finds the real file the user opened.
+enum AppLocation {
+    static var original: URL {
+        let here = Bundle.main.bundleURL
+        typealias IsTrans = @convention(c) (CFURL, UnsafeMutablePointer<Bool>, UnsafeMutablePointer<Unmanaged<CFError>?>?) -> Bool
+        typealias Orig = @convention(c) (CFURL, UnsafeMutablePointer<Unmanaged<CFError>?>?) -> Unmanaged<CFURL>?
+        guard let h = dlopen("/System/Library/Frameworks/Security.framework/Security", RTLD_LAZY),
+              let f1 = dlsym(h, "SecTranslocateIsTranslocatedURL"),
+              let f2 = dlsym(h, "SecTranslocateCreateOriginalPathForURL") else { return here }
+        var translocated = false
+        guard unsafeBitCast(f1, to: IsTrans.self)(here as CFURL, &translocated, nil), translocated,
+              let u = unsafeBitCast(f2, to: Orig.self)(here as CFURL, nil) else { return here }
+        return u.takeRetainedValue() as URL
+    }
+
+    static func isInApplications(_ u: URL) -> Bool {
+        let p = u.standardizedFileURL.path
+        return p.hasPrefix("/Applications/") || p.hasPrefix(FileManager.default.homeDirectoryForCurrentUser.path + "/Applications/")
     }
 }
