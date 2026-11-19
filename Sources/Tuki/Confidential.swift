@@ -19,8 +19,11 @@ final class Vault: ObservableObject {
     @Published private(set) var unlocked = false
     @Published private(set) var items: [SecretItem] = []
     @Published var message = ""
-    /// True while macOS is asking for the password, so the panel doesn't close underneath it.
-    private(set) var authenticating = false
+    /// True while macOS is asking for the password, and for a moment after: when the password box
+    /// closes, focus bounces between apps, which must not close the panel.
+    var authenticating: Bool { asking || Date() < graceUntil }
+    private var asking = false
+    private var graceUntil = Date.distantPast
     /// An item waiting to be saved once the user unlocks (from "Move to Confidential").
     private var pending: SecretItem?
     private var clearTimer: Timer?
@@ -33,12 +36,21 @@ final class Vault: ObservableObject {
             message = "This Mac has no login password, so Confidential can't be locked. Set one in System Settings → Users & Groups."
             return
         }
-        authenticating = true
+        asking = true
         ctx.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: "open your Confidential items") { ok, error in
             Task { @MainActor in
                 let v = Vault.shared
-                v.authenticating = false
-                PanelController.shared.refocus()
+                v.asking = false
+                v.graceUntil = Date().addingTimeInterval(2)
+                // If the panel closed anyway, open it again on Confidential.
+                if ok && !PanelController.shared.isVisible {
+                    UIState.shared.tab = .secret
+                    PanelController.shared.show()
+                }
+                // Bring the panel back once the password box has fully gone.
+                for t in [0.2, 0.7, 1.4] {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + t) { PanelController.shared.refocus() }
+                }
                 guard ok else {
                     let code = (error as? LAError)?.code
                     v.message = (code == .userCancel || code == .systemCancel || code == .appCancel)
@@ -56,6 +68,7 @@ final class Vault: ObservableObject {
     }
 
     func lock() {
+        if asking { return }   // the password box is still open
         unlocked = false
         items = []
         pending = nil
