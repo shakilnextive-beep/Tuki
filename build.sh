@@ -1,7 +1,7 @@
 #!/bin/zsh
 # Builds Tuki.app without Xcode (Command Line Tools are enough).
 # ./build.sh          → build/Tuki.app
-# ./build.sh install  → also installs to ~/Applications and opens it
+# ./build.sh install  → also installs to /Applications and opens it
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -51,10 +51,10 @@ else
 fi
 
 if [[ "${1:-}" == "install" ]]; then
-  mkdir -p "$HOME/Applications"
+  mkdir -p "/Applications"
   pkill -x Tuki 2>/dev/null || true
-  rm -rf "$HOME/Applications/Tuki.app"
-  cp -R "$APP" "$HOME/Applications/Tuki.app"
-  open "$HOME/Applications/Tuki.app"
-  echo "Installed and opened ~/Applications/Tuki.app"
+  rm -rf "/Applications/Tuki.app"
+  cp -R "$APP" "/Applications/Tuki.app"
+  open "/Applications/Tuki.app"
+  echo "Installed and opened /Applications/Tuki.app"
 fi

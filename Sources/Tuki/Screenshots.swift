@@ -16,7 +16,7 @@ enum Screenshots {
         let shots: [(String, Tab?, NSAppearance.Name)] = [
             ("clipboard-dark", .clips, .darkAqua), ("clipboard-light", .clips, .aqua),
             ("emoji-dark", .emoji, .darkAqua), ("snippets-light", .snips, .aqua),
-            ("symbols-dark", .sym, .darkAqua), ("settings-dark", nil, .darkAqua),
+            ("symbols-dark", .sym, .darkAqua), ("confidential-light", .secret, .aqua), ("settings-dark", nil, .darkAqua),
         ]
         var i = 0
         func next() {

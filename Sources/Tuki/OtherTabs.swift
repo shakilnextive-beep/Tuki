@@ -77,7 +77,7 @@ struct SnippetsTab: View {
         }
         .padding(11)
         .background(RoundedRectangle(cornerRadius: 10).fill(Theme.row))
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Theme.line))
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Theme.cardLine))
     }
 
     private var form: some View {
@@ -106,7 +106,7 @@ struct SnippetsTab: View {
         }
         .padding(11)
         .background(RoundedRectangle(cornerRadius: 10).fill(Theme.row))
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Theme.line))
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Theme.cardLine))
     }
 
     private func label(_ s: String) -> some View {
@@ -166,7 +166,7 @@ private struct SnippetRow: View {
             .padding(5)
         }
         .background(RoundedRectangle(cornerRadius: 10).fill(hover || highlighted ? Theme.rowHover : Theme.row))
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(highlighted ? Theme.accent : Theme.line, lineWidth: highlighted ? 1.5 : 1))
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(highlighted ? Theme.accent : Theme.cardLine, lineWidth: highlighted ? 1.5 : 1))
         .onHover { hover = $0 }
     }
 }
@@ -201,7 +201,7 @@ struct CellButton: View {
             Text(text).font(.system(size: size))
                 .frame(maxWidth: .infinity).aspectRatio(1, contentMode: .fit)
                 .background(RoundedRectangle(cornerRadius: 8).fill(boxed ? (hover ? Theme.rowHover : Theme.row) : (hover ? Theme.field : .clear)))
-                .overlay(RoundedRectangle(cornerRadius: 8).stroke(boxed ? Theme.line : .clear))
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(boxed ? Theme.cardLine : .clear))
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -283,7 +283,7 @@ private struct KaoCell: View {
             Text(text).font(.system(size: 13)).lineLimit(1).truncationMode(.tail)
                 .frame(maxWidth: .infinity, minHeight: 38).padding(.horizontal, 6)
                 .background(RoundedRectangle(cornerRadius: 8).fill(hover ? Theme.rowHover : Theme.row))
-                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Theme.line))
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Theme.cardLine))
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain).onHover { hover = $0 }.help(text)

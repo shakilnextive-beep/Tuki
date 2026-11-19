@@ -8,6 +8,7 @@ struct PanelView: View {
     @AppStorage(Pref.showTitle) private var showTitle = false
     @AppStorage(Pref.searchField) private var searchFieldMode = "always"
     @AppStorage(Pref.showFooter) private var showFooter = true
+    @AppStorage(Pref.hiddenTabs) private var hiddenTabs = ""
 
     /// "When typing" hides the field until the first letter; it stays focused so typing still works.
     private var searchHidden: Bool { searchFieldMode == "typing" && ui.query.isEmpty }
@@ -30,6 +31,7 @@ struct PanelView: View {
                     switch ui.tab {
                     case .clips: ClipsTab()
                     case .snips: SnippetsTab()
+                    case .secret: ConfidentialTab()
                     case .emoji: EmojiTab()
                     case .stickers: StickersTab()
                     case .gif: GifTab()
@@ -85,12 +87,20 @@ struct PanelView: View {
 
     private var tabBar: some View {
         HStack(spacing: 2) {
-            ForEach(Tab.allCases, id: \.self) { t in
+            ForEach(Tab.visible, id: \.self) { t in
                 TabButton(tab: t, selected: ui.tab == t) {
                     ui.tab = t
                     ui.highlight = nil
                     ui.formOpen = false
                     searchFocused = true
+                }
+                // Right-click a tab to hide it; Settings → Appearance brings tabs back.
+                .contextMenu {
+                    if t != .clips { Button("Hide \(t.title)") { Tab.setHidden(t, true) } }
+                    if !hiddenTabs.isEmpty {
+                        Button("Show All Tabs") { Pref.d.set("", forKey: Pref.hiddenTabs) }
+                    }
+                    Button("Choose Tabs…") { SettingsWindow.shared.show() }
                 }
             }
         }
@@ -118,7 +128,7 @@ struct PanelView: View {
     @ViewBuilder private var toast: some View {
         if let t = ui.toast {
             Text(t).font(.system(size: 12.5, weight: .medium))
-                .foregroundStyle(Theme.row)
+                .foregroundStyle(Theme.onInk)
                 .padding(.horizontal, 14).padding(.vertical, 7)
                 .background(Capsule().fill(Theme.ink))
                 .padding(.bottom, 46)
@@ -138,7 +148,7 @@ private struct TabButton: View {
             VStack(spacing: 3) {
                 glyph.frame(height: 18)
                 Text(tab.title).font(.system(size: 10.5, weight: selected ? .semibold : .regular))
-                    .lineLimit(1).minimumScaleFactor(0.75)
+                    .lineLimit(1).fixedSize()
             }
             .foregroundStyle(selected ? Theme.accent : hover ? Theme.ink : Theme.muted)
             .frame(maxWidth: .infinity, minHeight: 48)
@@ -157,6 +167,7 @@ private struct TabButton: View {
         switch tab {
         case .clips: Image(systemName: "list.clipboard").font(.system(size: 15))
         case .snips: Image(systemName: "bookmark").font(.system(size: 15))
+        case .secret: Image(systemName: "lock").font(.system(size: 15))
         case .emoji: Image(systemName: "face.smiling").font(.system(size: 15))
         case .stickers: Image(systemName: "person.crop.square").font(.system(size: 15))
         case .gif: Text("GIF").font(.system(size: 11, weight: .heavy))

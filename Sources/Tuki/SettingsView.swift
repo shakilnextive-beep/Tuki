@@ -257,9 +257,32 @@ private struct AppearanceSettings: View {
     @AppStorage(Pref.showTitle) private var showTitle = false
     @AppStorage(Pref.showAppIcons) private var showAppIcons = false
     @AppStorage(Pref.showFooter) private var showFooter = true
+    @AppStorage(Pref.look) private var look = "system"
+    @AppStorage(Pref.hiddenTabs) private var hiddenTabs = ""
+
+    private func shown(_ t: Tab) -> Binding<Bool> {
+        Binding(get: { t == .clips || !hiddenTabs.split(separator: ",").contains(Substring(t.rawValue)) },
+                set: { Tab.setHidden(t, !$0) })
+    }
 
     var body: some View {
         Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 12) {
+            Row(label: "Look") {
+                Picker("", selection: $look) {
+                    Text("Match Mac").tag("system")
+                    Text("Light").tag("light")
+                    Text("Dark").tag("dark")
+                }.labelsHidden().pickerStyle(.segmented).frame(width: 240)
+            }
+            Row(label: "Tabs") {
+                FlowLayout(spacing: 4) {
+                    ForEach(Tab.allCases, id: \.self) { t in
+                        Toggle(t.title, isOn: shown(t)).disabled(t == .clips).frame(width: 100, alignment: .leading)
+                    }
+                }.frame(width: 320, alignment: .leading)
+                Note(text: "Turn off the tabs you don't use. You can also right-click a tab in Tuki to hide it.")
+            }
+            Divider().gridCellColumns(2)
             Row(label: "Popup at") {
                 Picker("", selection: $popupAt) {
                     Text("Beside text cursor").tag("caret")

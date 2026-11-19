@@ -6,11 +6,25 @@ import SwiftUI
 // MARK: - Shared UI state
 
 enum Tab: String, CaseIterable {
-    case clips, snips, emoji, stickers, gif, kao, sym
+    case clips, snips, secret, emoji, stickers, gif, kao, sym
+
+    /// Tabs the user kept (Settings → Appearance → Tabs). Clipboard is always there.
+    static var visible: [Tab] {
+        let hidden = Set(Pref.string(Pref.hiddenTabs).split(separator: ",").map(String.init))
+        return allCases.filter { $0 == .clips || !hidden.contains($0.rawValue) }
+    }
+    @MainActor static func setHidden(_ t: Tab, _ hide: Bool) {
+        guard t != .clips else { return }
+        var hidden = Set(Pref.string(Pref.hiddenTabs).split(separator: ",").map(String.init))
+        if hide { hidden.insert(t.rawValue) } else { hidden.remove(t.rawValue) }
+        Pref.d.set(hidden.sorted().joined(separator: ","), forKey: Pref.hiddenTabs)
+        if hide && UIState.shared.tab == t { UIState.shared.tab = .clips }
+    }
     var title: String {
         switch self {
         case .clips: "Clipboard"
         case .snips: "Snippets"
+        case .secret: "Confidential"
         case .emoji: "Emoji"
         case .stickers: "Stickers"
         case .gif: "GIF"
@@ -22,6 +36,7 @@ enum Tab: String, CaseIterable {
         switch self {
         case .clips: "Search clipboard history"
         case .snips: "Search snippets"
+        case .secret: "Search confidential"
         case .emoji: "Search emoji"
         case .stickers: "Stickers"
         case .gif: "Search GIFs"
@@ -116,12 +131,30 @@ final class PanelController: NSObject, NSWindowDelegate {
 
     var isVisible: Bool { panel.isVisible }
 
+    /// Settings → Appearance → Look: follow the Mac, or always light / dark.
+    func applyLook() {
+        switch Pref.string(Pref.look) {
+        case "light": panel.appearance = NSAppearance(named: .aqua)
+        case "dark": panel.appearance = NSAppearance(named: .darkAqua)
+        default: panel.appearance = nil
+        }
+    }
+
     func toggle() { isVisible ? hide() : show() }
+
+    /// Brings the panel back to the front after macOS's password prompt closes.
+    func refocus() {
+        guard panel.isVisible else { return }
+        panel.makeKeyAndOrderFront(nil)
+        UIState.shared.focusToken += 1
+    }
 
     func show() {
         let ui = UIState.shared
         ui.highlight = nil
         ui.formOpen = false
+        if !Tab.visible.contains(ui.tab) { ui.tab = .clips }
+        applyLook()
         // Place it where Settings → Appearance → "Popup at" says, kept fully on screen.
         let mouse = NSEvent.mouseLocation
         let s = panel.frame.size
@@ -153,12 +186,13 @@ final class PanelController: NSObject, NSWindowDelegate {
     func hide() {
         stopKeys()
         panel.orderOut(nil)
+        Vault.shared.lock()   // Confidential asks for the Mac password again next time
         UIState.shared.query = ""
     }
 
     func windowDidResignKey(_ notification: Notification) {
         // Clicking anywhere else closes the panel, like the Windows one.
-        if !UIState.shared.showPermissionHelp { hide() }
+        if !UIState.shared.showPermissionHelp && !Vault.shared.authenticating { hide() }
     }
 
     /// Arrow keys, Return and Esc, caught before the search field sees them.
@@ -223,7 +257,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         refreshStatusItem()
         // Settings changes and new copies update the menu bar icon right away.
         NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
-            .receive(on: RunLoop.main).sink { [weak self] _ in self?.refreshStatusItem() }.store(in: &watchers)
+            .receive(on: RunLoop.main).sink { [weak self] _ in self?.refreshStatusItem(); PanelController.shared.applyLook() }.store(in: &watchers)
         Store.shared.$clips.receive(on: RunLoop.main).sink { [weak self] _ in self?.refreshStatusItem() }.store(in: &watchers)
 
         // The permission steps appear the first time the user opens the panel, never by surprise.

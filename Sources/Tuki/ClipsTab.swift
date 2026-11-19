@@ -131,7 +131,7 @@ struct ClipsTab: View {
         }
         .padding(.horizontal, 11).padding(.vertical, 9)
         .background(RoundedRectangle(cornerRadius: 10).fill(Theme.row))
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Theme.line))
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Theme.cardLine))
     }
 
     private var selectionBar: some View {
@@ -182,6 +182,14 @@ struct ClipsTab: View {
             let folder = c.kind == .code && store.folders.contains("Code") ? "Code" : (store.folders.first ?? "Work")
             store.addSnippet(title: String(t.prefix(28)), text: c.text, folder: folder)
             ui.flash("Saved to Snippets")
+        case .toSecret:
+            // Saved in Confidential (after the Mac password if it's locked), then removed from history.
+            let t = c.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            Vault.shared.unlock {
+                Vault.shared.add(SecretItem(title: String(t.prefix(28)), text: c.text))
+                store.delete(c.id)
+                ui.flash("Moved to Confidential")
+            }
         case .delete:
             store.delete(c.id); ui.flash("Deleted")
         }
@@ -189,7 +197,7 @@ struct ClipsTab: View {
 }
 
 enum ClipAction {
-    case pin, paste(PasteMode), copy, openLink, toSnippet, delete
+    case pin, paste(PasteMode), copy, openLink, toSnippet, toSecret, delete
 }
 
 struct ClipRow: View {
@@ -245,7 +253,7 @@ struct ClipRow: View {
             if menuOpen { actions }
         }
         .background(RoundedRectangle(cornerRadius: 10).fill(picked ? Theme.accentSoft : (hover || highlighted) ? Theme.rowHover : Theme.row))
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(picked || highlighted ? Theme.accent : Theme.line, lineWidth: highlighted && !picked ? 1.5 : 1))
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(picked || highlighted ? Theme.accent : Theme.cardLine, lineWidth: highlighted && !picked ? 1.5 : 1))
         .onHover { inside in
             hover = inside
             previewWork?.cancel()
@@ -376,6 +384,9 @@ struct ClipRow: View {
             }
             if item.kind != .image {
                 Button("Save as snippet") { onAction(.toSnippet) }.buttonStyle(SmallButtonStyle())
+                if Tab.visible.contains(.secret) {
+                    Button("Move to Confidential") { onAction(.toSecret) }.buttonStyle(SmallButtonStyle())
+                }
             }
             Button("Delete") { onAction(.delete) }.buttonStyle(SmallButtonStyle(kind: .danger))
         }
