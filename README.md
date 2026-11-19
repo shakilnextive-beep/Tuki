@@ -14,6 +14,7 @@
   <a href="https://github.com/shakilnextive-beep/Tuki/releases"><img src="https://img.shields.io/github/downloads/shakilnextive-beep/Tuki/total?color=E8721C" alt="Downloads"></a>
   <img src="https://img.shields.io/badge/macOS-15.4%2B-555" alt="macOS 15.4 or later">
   <img src="https://img.shields.io/badge/Apple%20Silicon%20%26%20Intel-supported-555" alt="Apple Silicon and Intel">
+  <a href="https://www.supportkori.com/mdshakil463"><img src="https://img.shields.io/badge/%E2%98%95%20Support%20Tuki-SupportKori-E8721C" alt="Support Tuki on SupportKori"></a>
 </p>
 
 ---
@@ -93,6 +94,14 @@ If you like Tuki, a ⭐ on this page helps others find it.
 
 ---
 
+## ☕ Support Tuki
+
+Tuki is free. If it saves you time, you can buy me a coffee on **[SupportKori](https://www.supportkori.com/mdshakil463)**. It keeps new features — and the Windows version — coming.
+
+You'll also find **☕ Support Tuki** in the app: right-click the menu bar icon, or Settings → About.
+
+---
+
 ## 🇧🇩 বাংলায়
 
 **Tuki** হলো Mac-এর জন্য clipboard manager। Windows-এর <kbd>Win</kbd>+<kbd>V</kbd>-এর সব সুবিধা এতে আছে, সাথে আরও কিছু: snippets, sticker, GIF আর বাংলা symbol।
@@ -104,6 +113,7 @@ If you like Tuki, a ⭐ on this page helps others find it.
 - **নিজের মতো সাজান:** যে tab দরকার নেই সেটায় right-click করে লুকিয়ে রাখুন। Settings → Appearance থেকে Light বা Dark বেছে নিন।
 - **আপডেট:** নতুন version এলে Tuki নিজেই জানাবে। এক ক্লিকে আপডেট হয়ে যাবে, পুরোনোটা মুছে নতুনটা বসে যাবে।
 - **মতামত দিন:** [Reviews & Suggestions](https://github.com/shakilnextive-beep/Tuki/discussions/1) পাতায় লিখুন, অথবা ইমেইল করুন।
+- **সমর্থন করুন:** Tuki ভালো লাগলে [SupportKori](https://www.supportkori.com/mdshakil463)-তে একটা কফি দিয়ে সমর্থন করুন ☕
 - **Windows version:** শীঘ্রই আসছে।
 
 ---

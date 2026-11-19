@@ -308,6 +308,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         m.addItem(withTitle: "Settings…", action: #selector(openSettings), keyEquivalent: ",").target = self
         m.addItem(withTitle: Updater.shared.available.map { "Install Tuki \($0.version)…" } ?? "Check for Updates…",
                   action: #selector(checkUpdates), keyEquivalent: "").target = self
+        m.addItem(withTitle: "☕ Support Tuki…", action: #selector(support), keyEquivalent: "").target = self
         let credit = m.addItem(withTitle: "Tuki \(AppInfo.version) · Creator: \(AppInfo.creator)", action: nil, keyEquivalent: "")
         credit.isEnabled = false
         let perm = m.addItem(withTitle: Paster.isTrusted ? "Paste permission: on" : "Turn on paste permission…",
@@ -323,6 +324,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func openPanel() { PanelController.shared.show() }
 
     @objc private func openSettings() { SettingsWindow.shared.show() }
+
+    @objc private func support() { NSWorkspace.shared.open(AppInfo.supportURL) }
 
     @objc private func checkUpdates() {
         Task {

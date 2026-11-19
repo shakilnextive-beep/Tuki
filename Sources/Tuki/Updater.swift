@@ -8,6 +8,8 @@ enum AppInfo {
     static let repo = "shakilnextive-beep/Tuki"
     static var repoURL: URL { URL(string: "https://github.com/\(repo)")! }
     static var feedbackURL: URL { URL(string: "https://github.com/\(repo)/discussions")! }
+    /// The creator's SupportKori page, where people can buy a coffee to support Tuki.
+    static let supportURL = URL(string: "https://www.supportkori.com/mdshakil463")!
     static var version: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0" }
 }
 
@@ -183,6 +185,13 @@ struct AboutSettings: View {
                 }
             }
             if !updater.status.isEmpty { Text(updater.status).font(.system(size: 12)).foregroundStyle(Theme.muted) }
+            Link(destination: AppInfo.supportURL) {
+                Label("Support Tuki — buy me a coffee", systemImage: "cup.and.saucer.fill")
+                    .font(.system(size: 12.5, weight: .semibold))
+                    .padding(.horizontal, 12).padding(.vertical, 6)
+                    .background(Capsule().fill(Theme.accentSoft))
+            }
+            .foregroundStyle(Theme.accent)
             HStack(spacing: 16) {
                 Link("GitHub page", destination: AppInfo.repoURL)
                 Link("Send feedback", destination: AppInfo.feedbackURL)
