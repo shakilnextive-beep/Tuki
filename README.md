@@ -41,6 +41,7 @@ All versions and release notes: [Releases](https://github.com/shakilnextive-beep
   <img src="docs/screenshots/symbols-dark.png" width="30%" alt="Symbols including Bangla">
 </p>
 <p align="center">
+  <img src="docs/screenshots/confidential-light.png" width="45%" alt="Confidential tab, locked">
   <img src="docs/screenshots/settings-dark.png" width="45%" alt="Settings">
 </p>
 
@@ -52,11 +53,13 @@ All versions and release notes: [Releases](https://github.com/shakilnextive-beep
 - **One-click paste** — click any item and it's pasted where you are typing. Paste several items in the order you pick.
 - **Smart actions** — paste as plain text, UPPERCASE / lowercase / Title Case, open a link, paste a colour as RGB or HEX, save as snippet.
 - **Snippets in folders** — text you type again and again, one click away.
+- **Confidential** — a locked tab for passwords, account numbers and private notes. It opens only with your Mac's login password (or Touch ID), keeps items encrypted in the macOS Keychain, locks again whenever Tuki closes, and clears pasted secrets from the clipboard after 30 seconds. Move any copied item in, or back out to Clipboard.
 - **Emoji, Kaomoji & Symbols** — every emoji, searchable; Mac key symbols and Bangla (৳ । ০–৯).
 - **GIFs** — search and paste animated GIFs (powered by GIPHY, needs a free key).
 - **Stickers** — turn any photo into an iPhone-style sticker with a white border, made on your Mac.
 - **Opens beside your text** — the panel appears next to where you type, never on top of it.
 - **Your shortcut** — <kbd>⇧</kbd><kbd>⌘</kbd><kbd>V</kbd> by default; change it in Settings.
+- **Your tabs, your look** — hide the tabs you don't use (right-click a tab), and choose Match Mac, Light or Dark.
 - **Settings** — what to save, history size, sort order, where the panel opens, menu bar icon, pause recording, clear on quit, and more.
 - **Automatic updates** — Tuki checks for new versions and installs them with one click. The old version is replaced; you never end up with two copies.
 - **Private** — your history stays on your Mac. Nothing is uploaded.
@@ -97,6 +100,8 @@ If you like Tuki, a ⭐ on this page helps others find it.
 - **ডাউনলোড:** উপরের [Download Tuki for Mac](https://github.com/shakilnextive-beep/Tuki/releases/latest/download/Tuki-mac.zip) লিংকে ক্লিক করুন। Zip খুলে Tuki-কে **Applications** folder-এ টেনে রাখুন।
 - **প্রথমবার খুললে** macOS সতর্কবার্তা দেখাতে পারে। তখন **System Settings → Privacy & Security**-এ গিয়ে **Open Anyway** চাপুন।
 - **ব্যবহার:** <kbd>⇧</kbd><kbd>⌘</kbd><kbd>V</kbd> চাপুন। Paste করার অনুমতি একবার দিতে হবে, Tuki নিজেই ধাপগুলো দেখিয়ে দেবে।
+- **Confidential:** গোপন জিনিস (password, account number) রাখার লক করা tab। খুলতে Mac-এর login password লাগে, Tuki বন্ধ হলেই আবার লক হয়ে যায়।
+- **নিজের মতো সাজান:** যে tab দরকার নেই সেটায় right-click করে লুকিয়ে রাখুন। Settings → Appearance থেকে Light বা Dark বেছে নিন।
 - **আপডেট:** নতুন version এলে Tuki নিজেই জানাবে। এক ক্লিকে আপডেট হয়ে যাবে, পুরোনোটা মুছে নতুনটা বসে যাবে।
 - **মতামত দিন:** [Reviews & Suggestions](https://github.com/shakilnextive-beep/Tuki/discussions/1) পাতায় লিখুন, অথবা ইমেইল করুন।
 - **Windows version:** শীঘ্রই আসছে।
