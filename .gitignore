@@ -5,3 +5,4 @@ dist/
 *.p12
 *.keychain-db
 .swiftpm/
+docs/supportkori/
