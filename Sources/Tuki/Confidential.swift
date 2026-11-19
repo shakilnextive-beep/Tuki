@@ -80,6 +80,13 @@ final class Vault: ObservableObject {
         save()
     }
 
+    /// Puts an item back into Clipboard history and removes it from Confidential.
+    func moveToClipboard(_ item: SecretItem) {
+        Store.shared.add(ClipItem(kind: ClipboardWatcher.classify(item.text, app: "Tuki"),
+                                  text: item.text, app: "Confidential", date: Date()))
+        delete(item.id)
+    }
+
     func delete(_ id: UUID) {
         items.removeAll { $0.id == id }
         save()
@@ -277,6 +284,9 @@ private struct SecretRow: View {
             } else {
                 IconButton(symbol: shown ? "eye.slash" : "eye", label: shown ? "Hide" : "Show") { shown.toggle() }
                 IconButton(symbol: "doc.on.doc", label: "Copy") { Vault.shared.use(item, pasteNow: false) }
+                IconButton(symbol: "arrow.uturn.backward", label: "Move back to Clipboard") {
+                    Vault.shared.moveToClipboard(item); ui.flash("Moved back to Clipboard")
+                }
                 IconButton(symbol: "trash", label: "Delete") { confirmDelete = true }.padding(.trailing, 5)
             }
         }
