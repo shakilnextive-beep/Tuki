@@ -259,6 +259,7 @@ private struct AppearanceSettings: View {
     @AppStorage(Pref.showFooter) private var showFooter = true
     @AppStorage(Pref.look) private var look = "system"
     @AppStorage(Pref.hiddenTabs) private var hiddenTabs = ""
+    @AppStorage(Pref.openOn) private var openOn = "clipboard"
 
     private func shown(_ t: Tab) -> Binding<Bool> {
         Binding(get: { t == .clips || !hiddenTabs.split(separator: ",").contains(Substring(t.rawValue)) },
@@ -273,6 +274,12 @@ private struct AppearanceSettings: View {
                     Text("Light").tag("light")
                     Text("Dark").tag("dark")
                 }.labelsHidden().pickerStyle(.segmented).frame(width: 240)
+            }
+            Row(label: "Open on") {
+                Picker("", selection: $openOn) {
+                    Text("Clipboard").tag("clipboard")
+                    Text("Last used tab").tag("last")
+                }.labelsHidden().frame(width: 160)
             }
             Row(label: "Tabs") {
                 FlowLayout(spacing: 4) {

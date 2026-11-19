@@ -149,10 +149,13 @@ final class PanelController: NSObject, NSWindowDelegate {
         UIState.shared.focusToken += 1
     }
 
-    func show() {
+    /// Opens the panel. It starts on Clipboard every time (Settings → Appearance → "Open on"),
+    /// unless a caller asks for a specific tab.
+    func show(on tab: Tab? = nil) {
         let ui = UIState.shared
         ui.highlight = nil
         ui.formOpen = false
+        if let tab { ui.tab = tab } else if Pref.string(Pref.openOn) != "last" { ui.tab = .clips }
         if !Tab.visible.contains(ui.tab) { ui.tab = .clips }
         applyLook()
         // Place it where Settings → Appearance → "Popup at" says, kept fully on screen.

@@ -39,6 +39,7 @@ enum Pref {
     static let giphyKey = "giphyKey"
     static let autoUpdate = "autoUpdate"
     static let hiddenTabs = "hiddenTabs"          // tab raw values, comma separated
+    static let openOn = "openOn"                  // "clipboard" | "last"
     static let look = "look"                      // "system" | "light" | "dark"
 
     static let menuIcons: [(String, String)] = [
@@ -54,7 +55,7 @@ enum Pref {
             popupAt: "caret", pinTo: "top", imageHeight: 42, previewDelay: 1500, highlight: "bold",
             specialSymbols: false, showMenuIcon: true, menuIcon: "list.clipboard", showRecentInMenu: false,
             searchField: "always", showTitle: false, showAppIcons: false, showFooter: true,
-            paused: false, autoUpdate: true, hiddenTabs: "", look: "system", clearOnQuit: false, clearSystemToo: false,
+            paused: false, autoUpdate: true, hiddenTabs: "", look: "system", openOn: "clipboard", clearOnQuit: false, clearSystemToo: false,
         ])
     }
 

@@ -179,8 +179,7 @@ enum StickerActions {
     }
 
     static func reopen() {
-        UIState.shared.tab = .stickers
-        PanelController.shared.show()
+        PanelController.shared.show(on: .stickers)
     }
 }
 

@@ -44,8 +44,7 @@ final class Vault: ObservableObject {
                 v.graceUntil = Date().addingTimeInterval(2)
                 // If the panel closed anyway, open it again on Confidential.
                 if ok && !PanelController.shared.isVisible {
-                    UIState.shared.tab = .secret
-                    PanelController.shared.show()
+                    PanelController.shared.show(on: .secret)
                 }
                 // Bring the panel back once the password box has fully gone.
                 for t in [0.2, 0.7, 1.4] {
