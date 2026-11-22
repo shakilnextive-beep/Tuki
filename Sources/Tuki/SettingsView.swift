@@ -110,6 +110,7 @@ private struct GeneralSettings: View {
     @AppStorage(Pref.pastePlain) private var pastePlain = false
     @AppStorage(Pref.copySound) private var copySound = true
     @AppStorage(Pref.copySoundName) private var copySoundName = "Purr"
+    @AppStorage(Pref.copySoundVolume) private var copySoundVolume = 1.0
 
     var body: some View {
         Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 14) {
@@ -151,6 +152,12 @@ private struct GeneralSettings: View {
                     }
                     .labelsHidden().frame(width: 120).disabled(!copySound)
                     .onChange(of: copySoundName) { _, n in CopySound.play(n, force: true) }
+                }
+                HStack(spacing: 8) {
+                    Image(systemName: "speaker.fill").foregroundStyle(Theme.muted)
+                    Slider(value: $copySoundVolume, in: 0.05...1) { editing in if !editing { CopySound.play(force: true) } }
+                        .frame(width: 180).disabled(!copySound)
+                    Image(systemName: "speaker.wave.3.fill").foregroundStyle(Theme.muted)
                 }
                 Note(text: "Customize the behavior when selecting an item:\n• Click with ⌥ pressed to only copy the item.\n• Click with ⇧⌘ pressed to paste it without formatting.")
             }

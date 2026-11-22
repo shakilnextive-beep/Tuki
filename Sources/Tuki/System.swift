@@ -385,7 +385,8 @@ enum CopySound {
         guard let sound else { return }
         cache[n] = sound
         sound.stop()
-        sound.volume = 0.6
+        let v = Pref.d.object(forKey: Pref.copySoundVolume) as? Double ?? 1
+        sound.volume = Float(max(0.05, min(1, v)))
         sound.play()
     }
 }

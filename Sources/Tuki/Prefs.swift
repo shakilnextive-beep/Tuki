@@ -40,6 +40,7 @@ enum Pref {
     static let autoUpdate = "autoUpdate"
     static let copySound = "copySound"            // play a short sound when something is copied
     static let copySoundName = "copySoundName"    // macOS system sound name
+    static let copySoundVolume = "copySoundVolume" // 0…1
     static let hiddenTabs = "hiddenTabs"          // tab raw values, comma separated
     static let openOn = "openOn"                  // "clipboard" | "last"
     static let look = "look"                      // "system" | "light" | "dark"
@@ -57,7 +58,7 @@ enum Pref {
             popupAt: "caret", pinTo: "top", imageHeight: 42, previewDelay: 1500, highlight: "bold",
             specialSymbols: false, showMenuIcon: true, menuIcon: "list.clipboard", showRecentInMenu: false,
             searchField: "always", showTitle: false, showAppIcons: false, showFooter: true,
-            paused: false, autoUpdate: true, copySound: true, copySoundName: "Purr", hiddenTabs: "", look: "system", openOn: "clipboard", clearOnQuit: false, clearSystemToo: false,
+            paused: false, autoUpdate: true, copySound: true, copySoundName: "Purr", copySoundVolume: 1.0, hiddenTabs: "", look: "system", openOn: "clipboard", clearOnQuit: false, clearSystemToo: false,
         ])
     }
 
