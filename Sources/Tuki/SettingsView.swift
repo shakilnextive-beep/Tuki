@@ -108,6 +108,8 @@ private struct GeneralSettings: View {
     @AppStorage(Pref.searchMode) private var searchMode = "exact"
     @AppStorage(Pref.pasteAuto) private var pasteAuto = true
     @AppStorage(Pref.pastePlain) private var pastePlain = false
+    @AppStorage(Pref.copySound) private var copySound = true
+    @AppStorage(Pref.copySoundName) private var copySoundName = "Purr"
 
     var body: some View {
         Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 14) {
@@ -142,6 +144,14 @@ private struct GeneralSettings: View {
             Row(label: "Behavior") {
                 Toggle("Paste automatically", isOn: $pasteAuto)
                 Toggle("Paste without formatting", isOn: $pastePlain)
+                HStack(spacing: 8) {
+                    Toggle("Play sound when copying", isOn: $copySound)
+                    Picker("", selection: $copySoundName) {
+                        ForEach(CopySound.choices, id: \.self) { Text($0).tag($0) }
+                    }
+                    .labelsHidden().frame(width: 120).disabled(!copySound)
+                    .onChange(of: copySoundName) { _, n in CopySound.play(n, force: true) }
+                }
                 Note(text: "Customize the behavior when selecting an item:\n• Click with ⌥ pressed to only copy the item.\n• Click with ⇧⌘ pressed to paste it without formatting.")
             }
         }

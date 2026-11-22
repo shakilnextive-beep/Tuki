@@ -52,6 +52,7 @@ All versions and release notes: [Releases](https://github.com/shakilnextive-beep
 
 - **Clipboard history** — text, links, images, colours, code and files. Search, filter by type, pin what you need, Clear all keeps pins.
 - **One-click paste** — click any item and it's pasted where you are typing. Paste several items in the order you pick.
+- **Copy sound** — a soft sound each time you copy, so you know it worked. Choose the sound or turn it off in Settings → General.
 - **Smart actions** — paste as plain text, UPPERCASE / lowercase / Title Case, open a link, paste a colour as RGB or HEX, save as snippet.
 - **Snippets in folders** — text you type again and again, one click away.
 - **Confidential** — a locked tab for passwords, account numbers and private notes. It opens only with your Mac's login password (or Touch ID), keeps items encrypted in the macOS Keychain, locks again whenever Tuki closes, and clears pasted secrets from the clipboard after 30 seconds. Move any copied item in, or back out to Clipboard.

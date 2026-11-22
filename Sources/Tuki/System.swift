@@ -50,6 +50,7 @@ final class ClipboardWatcher {
             item.files = urls.map(\.path)
             item.bundleID = bundle
             Store.shared.add(item)
+            CopySound.play()
             return
         }
         if let s = pb.string(forType: .string), !s.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -59,6 +60,7 @@ final class ClipboardWatcher {
             // Keep formatting (bold, links, colours) so it can be pasted back with it.
             if let rtf = pb.data(forType: .rtf), rtf.count < 300_000 { item.rtf = rtf }
             Store.shared.add(item)
+            CopySound.play()
             return
         }
         guard Pref.bool(Pref.saveImages) else { return }
@@ -72,6 +74,7 @@ final class ClipboardWatcher {
                                 imageSize: "\(rep.pixelsWide) × \(rep.pixelsHigh)", app: app, date: Date())
             item.bundleID = bundle
             Store.shared.add(item)
+            CopySound.play()
         }
     }
 
@@ -367,5 +370,22 @@ enum TypingSpot {
         let x = min(max(spot.minX - s.width / 2, vf.minX + 8), vf.maxX - s.width - 8)
         let below = spot.minY - gap - s.height
         return NSPoint(x: x, y: below >= vf.minY + 8 ? below : min(spot.maxY + gap, vf.maxY - s.height - 8))
+    }
+}
+
+/// A short sound each time Tuki records a copy, so you know it worked (Settings → General → Behavior).
+@MainActor
+enum CopySound {
+    static let choices = ["Purr", "Tink", "Pop", "Glass", "Ping", "Bottle", "Frog", "Morse", "Funk", "Submarine"]
+    private static var cache: [String: NSSound] = [:]
+    static func play(_ name: String? = nil, force: Bool = false) {
+        guard force || Pref.bool(Pref.copySound) else { return }
+        let n = name ?? Pref.string(Pref.copySoundName)
+        let sound = cache[n] ?? NSSound(named: NSSound.Name(n))?.copy() as? NSSound
+        guard let sound else { return }
+        cache[n] = sound
+        sound.stop()
+        sound.volume = 0.6
+        sound.play()
     }
 }
