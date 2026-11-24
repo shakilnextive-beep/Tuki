@@ -26,7 +26,7 @@ const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647) * 2 - 1;
 
 // ---------- music: 104 BPM, warm pad + soft pluck arpeggio + light beat, 38 s ----------
 {
-  const DUR = 38, n = DUR * SR, L = new Float32Array(n), R = new Float32Array(n);
+  const DUR = Number(process.env.DUR || 38), n = DUR * SR, L = new Float32Array(n), R = new Float32Array(n);
   const bpm = 104, beat = 60 / bpm, bar = beat * 4;
   // I – V – vi – IV in C major (bright, friendly)
   const chords = [[48, 55, 60, 64, 67], [43, 50, 55, 59, 62], [45, 52, 57, 60, 64], [41, 48, 53, 57, 60]];
@@ -56,7 +56,7 @@ const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647) * 2 - 1;
       for (let k = 0; k < len; k++) { const t = k / SR; const v = (Math.sin(2 * Math.PI * f * t) + 0.25 * Math.sin(4 * Math.PI * f * t)) * 0.035 * Math.exp(-t * 7) * Math.min(1, t / 0.003); add(s0 + k, v, e % 2 ? 0.35 : -0.35); }
     }
     // soft kick on every beat + shaker on off-beats (from bar 2, stops for the end card tail)
-    if (b >= 1 && t0 < 33) for (let q = 0; q < 4; q++) {
+    if (b >= 1 && t0 < DUR - 5) for (let q = 0; q < 4; q++) {
       const s0 = Math.floor((t0 + q * beat) * SR);
       for (let k = 0; k < 0.25 * SR; k++) { const t = k / SR; const f = 50 + 70 * Math.exp(-t * 30); add(s0 + k, Math.sin(2 * Math.PI * f * t) * 0.16 * Math.exp(-t * 14)); }
       const s1 = Math.floor((t0 + q * beat + beat / 2) * SR);
@@ -66,7 +66,7 @@ const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647) * 2 - 1;
   }
   // gentle overall fade-out over the last 2.5 s
   for (let i = n - 2.5 * SR; i < n; i++) { const g = (n - i) / (2.5 * SR); L[i] *= g; R[i] *= g; }
-  writeWav('music.wav', L, R);
+  writeWav(process.env.MUSIC || 'music.wav', L, R);
 }
 
 // ---------- sound effects ----------

@@ -51,7 +51,7 @@ export const Keycap: React.FC<{label: string; at: number; press?: number; size: 
   const lit = pr >= 0;
   return (
     <div style={{width: u(size), height: u(size), borderRadius: u(size * 0.2), background: lit ? t.palette.primary : t.palette.light, color: lit ? t.palette.light : t.palette.text, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: u(size * 0.48), ...keyFont(t), boxShadow: `0 ${u(size * 0.08 * (1 - down))}px 0 ${alpha(t.palette.dark, 0.18)}, 0 ${u(1.5)}px ${u(3)}px ${alpha(t.palette.dark, 0.12)}`, border: `${u(0.15)}px solid ${alpha(t.palette.dark, 0.1)}`, opacity: p, transform: `translateY(${(1 - p) * 0.05 * H + down * u(size * 0.07)}px) scale(${0.92 + 0.08 * p})`}}>
-      {label === '⌘' ? <Icon name="cmd" size={u(size * 0.5)} color={lit ? t.palette.light : t.palette.text} stroke={2.2} /> : label === '⇧' ? <Icon name="shift" size={u(size * 0.5)} color={lit ? t.palette.light : t.palette.text} stroke={2.2} /> : label}
+      {label === 'win' ? <svg width={u(size * 0.42)} height={u(size * 0.42)} viewBox="0 0 20 20">{[[0, 0], [11, 0], [0, 11], [11, 11]].map(([x, y], i) => <rect key={i} x={x} y={y} width="9" height="9" rx="1.2" fill={lit ? t.palette.light : t.palette.text} />)}</svg> : label === '⌘' ? <Icon name="cmd" size={u(size * 0.5)} color={lit ? t.palette.light : t.palette.text} stroke={2.2} /> : label === '⇧' ? <Icon name="shift" size={u(size * 0.5)} color={lit ? t.palette.light : t.palette.text} stroke={2.2} /> : label}
     </div>
   );
 };
@@ -280,22 +280,32 @@ export const Silhouette: React.FC<{height: number; at: number}> = ({height, at})
 export const MacDevice: React.FC<{width: number; rotY?: number; rotX?: number; children: React.ReactNode}> = ({width, rotY = -18, rotX = 5, children}) => {
   const t = useTheme();
   const {u} = useU();
-  const sw = u(width), sh = sw * 0.625, bez = sw * 0.02;
+  const P = t.palette;
+  // MacBook look: aluminium lid edge, thin black bezel with a notch, silver base with the thumb cut-out (greys mixed from the palette)
+  const sw = u(width), sh = sw * 0.625, bez = sw * 0.016, edge = sw * 0.006;
+  const alu1 = mix(P.dark, P.light, 0.14), alu2 = mix(P.dark, P.light, 0.32), alu3 = mix(P.dark, P.light, 0.5);
   return (
     <div style={{perspective: u(240)}}>
       <div style={{transform: `rotateY(${rotY}deg) rotateX(${rotX}deg)`, transformStyle: 'preserve-3d', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-        <div style={{padding: bez, borderRadius: bez * 1.8, background: t.palette.dark, boxShadow: `0 ${u(5)}px ${u(12)}px ${alpha(t.palette.dark, 0.35)}, inset 0 0 0 ${u(0.2)}px ${alpha(t.palette.light, 0.12)}`}}>
-          <div style={{width: sw, height: sh, borderRadius: bez * 0.6, overflow: 'hidden', position: 'relative', background: `linear-gradient(140deg, ${alpha(t.palette.primary, 0.35)}, ${t.palette.light} 50%, ${alpha(t.palette.primary, 0.22)}), ${t.palette.light}`}}>
-            <div style={{position: 'absolute', left: 0, right: 0, top: 0, height: sh * 0.04, background: alpha(t.palette.light, 0.75), display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: sw * 0.012, paddingRight: sw * 0.015, fontSize: sh * 0.022, color: alpha(t.palette.dark, 0.7), ...bodyFont(t)}}>
-              <Img src={staticFile('img/logo.png')} style={{height: sh * 0.026}} /> <span>Thu 9:41</span>
+        {/* lid: aluminium edge around the black bezel */}
+        <div style={{padding: edge, borderRadius: `${bez * 2.6}px ${bez * 2.6}px ${edge * 2}px ${edge * 2}px`, background: `linear-gradient(${alu1}, ${alu2})`, boxShadow: `0 ${u(5)}px ${u(12)}px ${alpha(P.dark, 0.3)}`}}>
+          <div style={{position: 'relative', padding: `${bez}px ${bez}px ${bez * 1.4}px`, borderRadius: `${bez * 2.2}px ${bez * 2.2}px ${edge}px ${edge}px`, background: P.dark}}>
+            <div style={{position: 'absolute', left: '50%', top: 0, transform: 'translateX(-50%)', width: sw * 0.12, height: bez * 1.9, borderRadius: `0 0 ${bez}px ${bez}px`, background: P.dark, zIndex: 3}}>
+              <div style={{position: 'absolute', left: '50%', top: '30%', width: bez * 0.5, height: bez * 0.5, borderRadius: '50%', transform: 'translateX(-50%)', background: mix(P.dark, P.light, 0.85)}} />
             </div>
-            {children}
+            <div style={{width: sw, height: sh, borderRadius: bez * 0.7, overflow: 'hidden', position: 'relative', background: `linear-gradient(140deg, ${alpha(P.primary, 0.35)}, ${P.light} 50%, ${alpha(P.primary, 0.22)}), ${P.light}`}}>
+              <div style={{position: 'absolute', left: 0, right: 0, top: 0, height: sh * 0.045, background: alpha(P.light, 0.75), display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: sw * 0.012, paddingRight: sw * 0.015, fontSize: sh * 0.022, color: alpha(P.dark, 0.7), ...bodyFont(t)}}>
+                <Img src={staticFile('img/logo.png')} style={{height: sh * 0.026}} /> <span>Thu 9:41</span>
+              </div>
+              {children}
+            </div>
           </div>
         </div>
-        <div style={{width: (sw + 2 * bez) * 1.14, height: sh * 0.045, borderRadius: `0 0 ${sh * 0.04}px ${sh * 0.04}px`, background: `linear-gradient(${alpha(t.palette.dark, 0.18)}, ${alpha(t.palette.dark, 0.32)})`, boxShadow: `0 ${u(3)}px ${u(6)}px ${alpha(t.palette.dark, 0.25)}`}}>
-          <div style={{width: '16%', height: '35%', margin: '0 auto', borderRadius: `0 0 ${u(1)}px ${u(1)}px`, background: alpha(t.palette.dark, 0.25)}} />
+        {/* base: thin aluminium wedge with the thumb cut-out */}
+        <div style={{position: 'relative', width: (sw + 2 * bez + 2 * edge) * 1.13, height: sh * 0.04, borderRadius: `${edge}px ${edge}px ${sh * 0.05}px ${sh * 0.05}px / ${edge}px ${edge}px ${sh * 0.04}px ${sh * 0.04}px`, background: `linear-gradient(${mix(P.dark, P.light, 0.08)} 0%, ${alu2} 55%, ${alu3} 100%)`, boxShadow: `inset 0 ${u(0.15)}px 0 ${alpha(P.light, 0.9)}`}}>
+          <div style={{position: 'absolute', left: '50%', top: 0, transform: 'translateX(-50%)', width: '15%', height: '45%', borderRadius: `0 0 ${sh * 0.03}px ${sh * 0.03}px`, background: alu2}} />
         </div>
-        <div style={{width: (sw + 2 * bez) * 1.05, height: sh * 0.09, marginTop: -sh * 0.02, borderRadius: '50%', background: `radial-gradient(ellipse at center, ${alpha(t.palette.dark, 0.28)} 0%, transparent 70%)`, filter: `blur(${u(1.2)}px)`}} />
+        <div style={{width: (sw + 2 * bez) * 1.08, height: sh * 0.09, marginTop: -sh * 0.02, borderRadius: '50%', background: `radial-gradient(ellipse at center, ${alpha(P.dark, 0.3)} 0%, transparent 70%)`, filter: `blur(${u(1.2)}px)`}} />
       </div>
     </div>
   );

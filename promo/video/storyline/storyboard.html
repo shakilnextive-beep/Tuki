@@ -1,0 +1,151 @@
+<title>Tuki: Windows vs Mac</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: a production board — act timeline on top, then scene cards (frame + voice line + direction) in a responsive grid. */
+:root{
+  --bg:#F6F1EC; --panel:#FFFFFF; --ink:#1B1D22; --muted:#5F636D; --line:#E4DBD2; --accent:#C2560D; --accent-soft:#F7E3D3;
+  --act-hook:#3D6FB6; --act-problem:#B3261E; --act-solution:#C2560D; --act-cta:#2E7D4F;
+  --display:"Space Grotesk", "Noto Sans Bengali", system-ui, sans-serif;
+  --body:"Noto Sans Bengali", "Space Grotesk", system-ui, sans-serif;
+  /* frame (picture) palette — fixed, it is the video's own look */
+  --f-cream:#EFE6DD; --f-card:#FBF6F1; --f-ink:#1B1D22; --f-orange:#E8721C; --f-deep:#B8460A; --f-win:#2B3A55; --f-win2:#3E5578; --f-winpanel:#E8EEF7; --f-red:#C62828;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#17161A;--panel:#222126;--ink:#EEEAE6;--muted:#A9A4A0;--line:#36333A;--accent:#F08A3E;--accent-soft:#3A2618;--act-hook:#7AA4E0;--act-problem:#EF7B73;--act-solution:#F08A3E;--act-cta:#6CC497;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17161A;--panel:#222126;--ink:#EEEAE6;--muted:#A9A4A0;--line:#36333A;--accent:#F08A3E;--accent-soft:#3A2618;--act-hook:#7AA4E0;--act-problem:#EF7B73;--act-solution:#F08A3E;--act-cta:#6CC497;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+.wrap{max-width:1240px;margin:0 auto;padding-block:32px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:28px}
+header{display:flex;flex-wrap:wrap;gap:12px 32px;align-items:end;justify-content:space-between}
+h1{font-family:var(--display);font-size:clamp(26px,4vw,38px);margin:0;letter-spacing:-.01em;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0;max-width:62ch}
+.facts{display:flex;gap:10px;flex-wrap:wrap}
+.fact{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-variant-numeric:tabular-nums}
+.fact b{font-family:var(--display);font-size:20px;display:block;line-height:1.1}
+.fact span{font-size:12px;color:var(--muted)}
+/* act timeline */
+.timeline{display:flex;flex-direction:column;gap:8px}
+.bar{display:flex;height:34px;border-radius:9px;overflow:hidden;border:1px solid var(--line)}
+.seg{display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden}
+.ticks{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+/* scene grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.meta{display:flex;align-items:center;gap:10px;padding:12px 14px 0}
+.num{font-family:var(--display);font-weight:700;font-size:18px}
+.time{font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px}
+.act{margin-left:auto;font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;color:#fff}
+.frame{margin:10px 14px 0;aspect-ratio:16/9;max-width:100%;border-radius:10px;position:relative;overflow:hidden;background:var(--f-cream);font-family:var(--body);color:var(--f-ink)}
+.vo{margin:12px 14px 0;padding:10px 12px;border-radius:10px;background:var(--accent-soft);font-size:15px}
+.vo small{display:block;font-size:11px;letter-spacing:.06em;color:var(--accent);font-weight:700;margin-bottom:2px}
+.dir{margin:10px 14px 14px;color:var(--muted);font-size:13.5px}
+/* frame drawing helpers (picture colours) */
+.f-abs{position:absolute}
+.f-win{background:linear-gradient(160deg,var(--f-win2),var(--f-win))}
+.f-taskbar{position:absolute;left:0;right:0;bottom:0;height:9%;background:rgba(10,16,30,.72);display:flex;gap:3%;justify-content:center;align-items:center}
+.f-taskbar i{width:3.5%;aspect-ratio:1;border-radius:3px;background:rgba(255,255,255,.55)}
+.f-panel{background:var(--f-winpanel);border-radius:6px;padding:4%;display:flex;flex-direction:column;gap:5%;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.f-row{height:12%;min-height:8px;border-radius:3px;background:#fff;font-size:clamp(6px,1.3vw,9px);display:flex;align-items:center;padding:0 5%;color:#33445c;white-space:nowrap;overflow:hidden}
+.f-card{background:var(--f-card);border-radius:6px;box-shadow:0 3px 12px rgba(27,29,34,.14)}
+.f-key{display:inline-flex;align-items:center;justify-content:center;border-radius:5px;background:var(--f-orange);color:#fff;font-weight:700;font-family:var(--display)}
+.f-title{font-weight:700;font-size:clamp(11px,2.3vw,17px);line-height:1.2}
+.f-x{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--f-red);color:#fff;font-size:11px;font-weight:700}
+.f-check{color:#2E7D4F;font-weight:700}
+/* MacBook: thin black bezel with notch, aluminium lid edge, silver base with thumb cut-out, soft floor shadow */
+.f-mb{position:absolute;transform:perspective(600px) rotateY(-14deg) rotateX(4deg);transform-origin:50% 80%}
+.f-mb .lid{position:relative;border-radius:7% 7% 1.5% 1.5% / 11% 11% 2% 2%;background:linear-gradient(#C9CCD1,#9FA3AA);padding:0.9%}
+.f-mb .bezel{border-radius:6% 6% 1% 1% / 10% 10% 1.5% 1.5%;background:#0C0D10;padding:2.2% 2.2% 3%;position:relative}
+.f-mb .notch{position:absolute;left:50%;top:0;transform:translateX(-50%);width:11%;height:3.2%;background:#0C0D10;border-radius:0 0 30% 30% / 0 0 60% 60%;z-index:2}
+.f-mb .scr{width:100%;aspect-ratio:16/10;border-radius:1.2%;background:linear-gradient(140deg,#F6CFAE,var(--f-card) 55%);position:relative;overflow:hidden}
+.f-mb .scr::before{content:"";position:absolute;left:0;right:0;top:0;height:5%;background:rgba(255,255,255,.7);z-index:1}
+.f-mb .base{position:relative;margin:0 -6.5%;height:5.5%;min-height:5px;border-radius:0 0 40% 40% / 0 0 100% 100%;background:linear-gradient(#E2E4E8 0%,#B9BDC4 55%,#8E939B 100%);box-shadow:0 1px 0 #fff inset}
+.f-mb .base::after{content:"";position:absolute;left:50%;top:0;transform:translateX(-50%);width:16%;height:45%;border-radius:0 0 40% 40%/0 0 100% 100%;background:#A6AAB1}
+.f-mb .shadow{margin:1% -2% 0;height:10px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(27,29,34,.35),transparent 70%)}
+.f-tuki{position:absolute;background:#fff;border-radius:4px;border:1.5px solid var(--f-orange);display:flex;flex-direction:column;gap:6%;padding:5%}
+.f-tuki span{display:block;height:9%;border-radius:2px;background:#EFE6DD}
+.f-tuki span.hi{background:#F7D9BE;outline:1.5px solid var(--f-orange)}
+.f-logo{position:absolute;border-radius:22%;background:linear-gradient(160deg,#F49A4B,var(--f-deep));display:flex;align-items:center;justify-content:center}
+.f-logo::after{content:"";width:46%;height:58%;border-radius:12%;background:#fff;box-shadow:inset 0 -3px 0 #F7D9BE}
+.f-caption{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);background:rgba(27,29,34,.82);color:#fff;font-size:clamp(7px,1.5vw,11px);padding:3px 8px;border-radius:5px;white-space:nowrap}
+.f-caption b{color:#F49A4B}
+footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px;display:flex;flex-wrap:wrap;gap:8px 24px}
+@media (prefers-reduced-motion:no-preference){.card{transition:transform .2s}.card:hover{transform:translateY(-2px)}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Tuki: Windows vs Mac</h1>
+      <p class="sub">Motion video storyboard — Windows-এর Win+V-এর সাথে তুলনা দিয়ে শুরু, তারপর Mac-এর সমস্যা আর Tuki-র সমাধান। ছবিগুলো খসড়া; আসল ভিডিওতে animation, 3D Mac আর আসল Tuki screen থাকবে।</p>
+    </div>
+    <div class="facts">
+      <div class="fact"><b>~50s</b><span>দৈর্ঘ্য</span></div>
+      <div class="fact"><b>12</b><span>দৃশ্য</span></div>
+      <div class="fact"><b>16:9</b><span>Facebook</span></div>
+      <div class="fact"><b>বাংলা</b><span>voice</span></div>
+    </div>
+  </header>
+
+  <section class="timeline" aria-label="Act timeline">
+    <div class="bar" id="bar"></div>
+    <div class="ticks"><span>0s</span><span>10s</span><span>20s</span><span>30s</span><span>40s</span><span>50s</span></div>
+  </section>
+
+  <section class="grid" id="grid"></section>
+
+  <footer>
+    <span>Windows অংশ নিজে আঁকা — Microsoft-এর লোগো বা screenshot ছাড়া।</span>
+    <span>রং: ক্রিম + Tuki কমলা; Windows অংশ নীলচে-ধূসর।</span>
+    <span>লেখা কম, ছবি বেশি · মানুষের animation নেই।</span>
+  </footer>
+</div>
+
+<script>
+const ACTS={hook:['Hook','var(--act-hook)'],problem:['সমস্যা','var(--act-problem)'],solution:['সমাধান','var(--act-solution)'],cta:['শেষ','var(--act-cta)']};
+const key=(t,s)=>`<span class="f-key" style="width:clamp(16px,${s/3.2}vw,38px);height:clamp(16px,${s/3.2}vw,38px);font-size:clamp(9px,${s/6}vw,16px);margin-right:4px">${t}</span>`;
+const winDesk=(inner)=>`<div class="f-abs f-win" style="inset:0">${inner}<div class="f-taskbar"><i></i><i></i><i></i><i></i><i></i></div></div>`;
+const tuki=(l,t,w,h,hi=1)=>`<div class="f-tuki" style="left:${l}%;top:${t}%;width:${w}%;height:${h}%">${[0,1,2,3,4].map(i=>`<span class="${i===hi?'hi':''}"></span>`).join('')}</div>`;
+const mac=(l,t,w,inner)=>`<div class="f-mb" style="left:${l}%;top:${t}%;width:${w}%"><div class="lid"><div class="bezel"><div class="notch"></div><div class="scr">${inner}</div></div></div><div class="base"></div><div class="shadow"></div></div>`;
+const cap=(h)=>`<div class="f-caption">${h}</div>`;
+const logo=(l,t,s)=>`<div class="f-logo" style="left:${l}%;top:${t}%;width:${s}%;aspect-ratio:1"></div>`;
+
+const scenes=[
+ {t:'0–4s',act:'hook',vo:'Windows-এ Win আর V চাপলেই… আগের সব কপি, এক জায়গায়।',dir:'বাম অর্ধেকে Windows-ধাঁচের ডেস্কটপ। ⊞ + V চাপা হয়, নিচ থেকে clipboard panel উঠে আসে, পাঁচটা কপি সাজানো।',
+  f:()=>`<div class="f-abs" style="inset:0 50% 0 0">${winDesk(`<div class="f-abs f-panel" style="left:18%;top:14%;width:64%;height:66%"><div class="f-row">House 12, Road 5</div><div class="f-row">Meeting at 3:30 PM</div><div class="f-row">hello@example.com</div><div class="f-row">#F26B1D</div><div class="f-row">invoice_final.pdf</div></div>`)}</div><div class="f-abs" style="left:55%;top:38%">${key('⊞',9)} ${key('V',9)}</div>`},
+ {t:'4–8s',act:'hook',vo:'আর Mac-এ? Command V চাপলে… শুধু শেষ কপিটা।',dir:'ডান অর্ধেকে Mac। ⌘V চাপলে শুধু একটা লেখা আসে; আগের কপিগুলো ঝাপসা হয়ে মিলিয়ে যায়। মাঝখানে বড় VS।',
+  f:()=>`<div class="f-abs" style="inset:0 50% 0 0">${winDesk(`<div class="f-abs f-panel" style="left:18%;top:14%;width:64%;height:66%"><div class="f-row">House 12, Road 5</div><div class="f-row">Meeting at 3:30 PM</div><div class="f-row">hello@example.com</div><div class="f-row">#F26B1D</div></div>`)}</div><div class="f-abs" style="left:50%;top:0;bottom:0;right:0;background:var(--f-cream)"><div class="f-abs f-card" style="left:14%;top:38%;width:72%;padding:4%;font-size:clamp(7px,1.4vw,10px)">Meeting at 3:30 PM</div><div class="f-abs" style="left:14%;top:58%;width:72%;opacity:.35;filter:blur(2px);font-size:clamp(7px,1.4vw,10px)">House 12 · hello@… · #F26B1D</div><div class="f-abs" style="left:30%;top:14%">${key('⌘',12)} ${key('V',12)}</div></div><div class="f-abs" style="left:50%;top:50%;transform:translate(-50%,-50%);width:16%;aspect-ratio:1;border-radius:50%;background:var(--f-ink);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:clamp(10px,2.4vw,18px)">VS</div>`},
+ {t:'8–12.5s',act:'problem',vo:'আগেরটা দরকার? আবার সেই অ্যাপে ফিরে যান, খুঁজুন, আবার কপি করুন।',dir:'অ্যাপের জানালা দ্রুত একটার পর একটা বদলায় (Mail → Notes → Safari)। কোণে কাউন্টার “আবার খোঁজা · ৫ বার” বাড়তে থাকে।',
+  f:()=>`${[0,1,2].map(i=>`<div class="f-abs f-card" style="left:${14+i*12}%;top:${16+i*10}%;width:52%;height:52%;padding:3%"><div style="display:flex;gap:4px">${'<i style="width:6px;height:6px;border-radius:50%;background:#ccc;display:inline-block"></i>'.repeat(3)}</div><div style="font-size:clamp(7px,1.4vw,10px);margin-top:6%;color:#555">${['Mail','Notes','Safari'][i]}</div></div>`).join('')}<div class="f-abs" style="right:5%;top:7%;background:var(--f-deep);color:#fff;border-radius:999px;padding:2px 9px;font-size:clamp(7px,1.4vw,10px);font-weight:700">আবার খোঁজা · ৫ বার</div>${cap('আগেরটা দরকার? আবার <b>খুঁজুন</b>')}`},
+ {t:'12.5–19s',act:'problem',vo:'Emoji আলাদা জায়গায়। GIF নেই। বারবার একই লেখা টাইপ। আর copy করা password পড়ে থাকে খোলা।',dir:'চারটা কার্ড একে একে আসে, প্রতিটায় লাল ✕ পড়ে। কার্ডগুলো কথার তালে।',
+  f:()=>`<div class="f-abs" style="inset:12% 6% 18% 6%;display:grid;grid-template-columns:1fr 1fr;gap:6%">${['Emoji আলাদা','GIF নেই','বারবার টাইপ','Password খোলা'].map(s=>`<div class="f-card" style="display:flex;align-items:center;justify-content:space-between;padding:0 7%;font-weight:700;font-size:clamp(8px,1.7vw,12px)">${s}<span class="f-x">✕</span></div>`).join('')}</div>`},
+ {t:'19–22.5s',act:'problem',vo:'Mac এত শক্তিশালী… অথচ এই ছোট্ট জিনিসটাই নেই।',dir:'ধীরে zoom out: একটা সুন্দর Mac, পর্দায় ড্যাশ-দাগের ফাঁকা জায়গা জ্বলজ্বল করছে, যেন কিছু একটা নেই।',
+  f:()=>`${mac(22,12,56,`<div class="f-abs" style="left:58%;top:12%;width:32%;height:70%;border:2px dashed var(--f-orange);border-radius:5px;opacity:.85"></div>`)}`},
+ {t:'22.5–25s',act:'solution',vo:'তাই এলো — Tuki!',dir:'কমলা আলোর ঢেউ ছড়িয়ে পড়ে, মাঝে Tuki লোগো লাফিয়ে আসে, নিচে “Mac-এর জন্য Clipboard Manager”।',
+  f:()=>`<div class="f-abs" style="inset:0;background:radial-gradient(circle at 50% 45%,#F7C79E,var(--f-cream) 60%)"></div>${logo(42,22,16)}<div class="f-abs f-title" style="left:0;right:0;top:66%;text-align:center">Tuki</div><div class="f-abs" style="left:0;right:0;top:79%;text-align:center;font-size:clamp(7px,1.4vw,10px);color:#555">Mac-এর জন্য Clipboard Manager</div>`},
+ {t:'25–29.5s',act:'solution',vo:'Shift, Command, V — সব কপি, এক জায়গায়। লেখা, লিংক, ছবি, ফাইল।',dir:'3D Mac, ⇧⌘V চাপা হয়, Tuki panel খোলে। ক্যামেরা panel-এ zoom in করে; সারিতে লেখা, লিংক, ছবি, ফাইল।',
+  f:()=>`${mac(30,14,64,tuki(60,10,30,74))}<div class="f-abs" style="left:5%;top:36%">${key('⇧',8)} ${key('⌘',8)} ${key('V',8)}</div>`},
+ {t:'29.5–33s',act:'solution',vo:'Emoji, GIF, Sticker আর বাংলা symbol — এক click-এ।',dir:'panel-এর tab একে একে বদলায়: Emoji → GIF → Symbols। একটা emoji লেখার মধ্যে উড়ে গিয়ে বসে।',
+  f:()=>`<div class="f-abs" style="left:6%;top:16%;display:flex;flex-direction:column;gap:9px">${['Emoji','GIF','Sticker','৳ । ১২৩'].map(s=>`<span class="f-card" style="padding:3px 10px;font-weight:700;font-size:clamp(7px,1.5vw,11px)">${s}</span>`).join('')}</div>${mac(36,14,58,`<div class="f-abs" style="left:56%;top:10%;width:36%;height:76%;background:#fff;border:1.5px solid var(--f-orange);border-radius:4px;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding:6%;font-size:clamp(7px,1.3vw,10px)">${'😀😂🥹😍👍🙏🔥🎉৳।০১'.match(/./gu).map(e=>`<span>${e}</span>`).join('')}</div>`)}`},
+ {t:'33–36s',act:'solution',vo:'বারবার লেখা জিনিস? Snippets-এ রাখুন, এক click-এ paste।',dir:'Snippets panel, “Home address”-এ ক্লিক, পাশের Messages-এ পুরো ঠিকানা বসে যায়। ক্যামেরা panel থেকে Messages-এ সরে।',
+  f:()=>`${mac(14,14,72,`<div class="f-abs f-card" style="left:5%;top:18%;width:44%;height:30%;padding:4%;font-size:clamp(6px,1.2vw,9px)">House 12, Road 5, Dhanmondi<span style="color:var(--f-orange)">|</span></div>${tuki(62,8,30,78,1)}`)}${cap('<b>Snippets</b> — একবার save করুন')}`},
+ {t:'36–41s',act:'solution',vo:'Password আর account number? Confidential-এ লক করা থাকে, খোলে শুধু আপনার Mac-এর password দিয়ে।',dir:'তালা বন্ধ Confidential panel → Mac-এর password বাক্স সামনে বেরিয়ে আসে → তালা খোলে, লেখা •••• হয়ে লুকানো থাকে।',
+  f:()=>`${mac(30,14,64,`<div class="f-abs" style="left:38%;top:10%;width:30%;height:76%;background:#fff;border:1.5px solid var(--f-orange);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:clamp(12px,3vw,22px)">🔒</div>`)}<div class="f-abs f-card" style="left:8%;top:30%;width:34%;padding:3%;font-size:clamp(7px,1.3vw,10px);text-align:center"><b>Tuki</b><div style="margin-top:6%;border:1.5px solid var(--f-orange);border-radius:3px;padding:2%">••••••••</div></div>`},
+ {t:'41–44.5s',act:'solution',vo:'কপি করলেই ছোট্ট একটা শব্দ, নতুন আপডেট এক click-এ।',dir:'⌘C চাপার সাথে শব্দের ঢেউ (বৃত্ত ছড়ায়), তারপর “Tuki is available → Install Update → ✓ Updated”।',
+  f:()=>`<div class="f-abs" style="left:10%;top:30%">${key('⌘',10)} ${key('C',10)}</div><div class="f-abs" style="left:31%;top:28%;width:16%;aspect-ratio:1;border-radius:50%;border:2px solid var(--f-orange);opacity:.6"></div><div class="f-abs" style="left:28%;top:22%;width:22%;aspect-ratio:1;border-radius:50%;border:2px solid var(--f-orange);opacity:.3"></div><div class="f-abs f-card" style="left:55%;top:30%;width:38%;padding:3%;font-size:clamp(7px,1.4vw,10px)"><b>Tuki 1.2 is available</b><div style="margin-top:7%;display:inline-block;background:var(--f-deep);color:#fff;border-radius:3px;padding:1px 8px">✓ Updated</div></div>`},
+ {t:'44.5–50s',act:'cta',vo:'Windows-এর সেই সুবিধা, এখন Mac-এ — আরও বেশি। Tuki, সম্পূর্ণ ফ্রি। লিংক কমেন্টে!',dir:'দুই ভাগে তুলনা: Windows-এ ৩টা টিক, Tuki-তে ৮টা টিক; Tuki-র দিকটা বড় হয়ে পুরো পর্দা নেয়। শেষে লোগো, “Mac-এর জন্য ফ্রি”, “লিংক কমেন্টে”, Creative Assistant পেইজ।',
+  f:()=>`<div class="f-abs f-win" style="left:0;top:0;bottom:0;width:30%;padding:4%;color:#fff;font-size:clamp(6px,1.2vw,9px);line-height:1.7">Win + V<br>✓ History<br>✓ Emoji<br>✓ GIF</div><div class="f-abs" style="left:30%;right:0;top:0;bottom:0;background:var(--f-cream)">${logo(40,8,14)}<div class="f-abs f-title" style="left:0;right:0;top:36%;text-align:center">Tuki</div><div class="f-abs" style="left:0;right:0;top:52%;text-align:center;font-size:clamp(7px,1.4vw,10px)">Mac-এর জন্য <b style="color:var(--f-deep)">ফ্রি</b> Clipboard Manager</div><div class="f-abs" style="left:50%;top:66%;transform:translateX(-50%);background:var(--f-deep);color:#fff;border-radius:999px;padding:2px 12px;font-size:clamp(7px,1.4vw,10px);font-weight:700;white-space:nowrap">⬇ লিংক কমেন্টে</div><div class="f-abs" style="left:0;right:0;top:84%;text-align:center;font-size:clamp(6px,1.2vw,9px);color:#555">Creative Assistant পেইজ</div></div>`},
+];
+
+// timeline bar
+const secs=s=>{const m=s.t.replace('s','').split('–').map(Number);return m[1]-m[0];};
+const byAct={};scenes.forEach(s=>byAct[s.act]=(byAct[s.act]||0)+secs(s));
+document.getElementById('bar').innerHTML=Object.entries(byAct).map(([a,d])=>`<div class="seg" style="flex:${d};background:${ACTS[a][1]}">${ACTS[a][0]} · ${Math.round(d)}s</div>`).join('');
+// cards
+document.getElementById('grid').innerHTML=scenes.map((s,i)=>`
+  <article class="card">
+    <div class="meta"><span class="num">${String(i+1).padStart(2,'0')}</span><span class="time">${s.t}</span><span class="act" style="background:${ACTS[s.act][1]}">${ACTS[s.act][0]}</span></div>
+    <div class="frame" role="img" aria-label="Scene ${i+1} sketch">${s.f()}</div>
+    <div class="vo"><small>VOICE</small>${s.vo}</div>
+    <p class="dir">${s.dir}</p>
+  </article>`).join('');
+</script>
